@@ -6,7 +6,7 @@ pkgname="$_pkgname-test"
 pkgver=0.4.2~custom
 pkgrel=1
 pkgdesc="Modern style for Qt applications"
-url="file:///home/rileyaft/Downloads/Lightly"
+url="https://github.com/rileyaft/Lightly/"
 arch=('x86_64' 'aarch64')
 license=("GPL2")
 
