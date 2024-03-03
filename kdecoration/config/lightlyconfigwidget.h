@@ -25,7 +25,7 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include "config/ui_lightlyconfigurationui.h"
+#include "config/ui/lightlyconfigurationui.h"
 #include "lightlyexceptionlistwidget.h"
 #include "lightlysettings.h"
 #include "lightly.h"
