@@ -22,9 +22,9 @@
 #include "lightlyboxshadowrenderer.h"
 
 // Qt
+#include <QDebug>
 #include <QPainter>
 #include <QtMath>
-#include <QDebug>
 namespace Lightly
 {
 
@@ -47,9 +47,8 @@ static inline QSize calculateBlurExtent(int radius)
     return QSize(blurRadius, blurRadius);
 }
 
-struct BoxLobes
-{
-    int left;  ///< how many pixels sample to the left
+struct BoxLobes {
+    int left; ///< how many pixels sample to the left
     int right; ///< how many pixels sample to the right
 };
 
@@ -93,11 +92,7 @@ static QVector<BoxLobes> computeLobes(int radius)
 
     Q_ASSERT(major + minor + final == blurRadius);
 
-    return {
-        {major, minor},
-        {minor, major},
-        {final, final}
-    };
+    return {{major, minor}, {minor, major}, {final, final}};
 }
 
 /**
@@ -113,8 +108,13 @@ static QVector<BoxLobes> computeLobes(int radius)
  * @param transposeInput Whether the input is transposed.
  * @param transposeOutput Whether the output should be transposed.
  **/
-static inline void boxBlurRowAlpha(const uint8_t *src, uint8_t *dst, int width, int horizontalStride,
-                                   int verticalStride, const BoxLobes &lobes, bool transposeInput,
+static inline void boxBlurRowAlpha(const uint8_t *src,
+                                   uint8_t *dst,
+                                   int width,
+                                   int horizontalStride,
+                                   int verticalStride,
+                                   const BoxLobes &lobes,
+                                   bool transposeInput,
                                    bool transposeOutput)
 {
     const int inputStep = transposeInput ? verticalStride : horizontalStride;
@@ -191,7 +191,7 @@ static inline void boxBlurAlpha(QImage &image, int radius, const QRect &rect = {
     const int pixelStride = image.depth() >> 3;
 
     const int bufferStride = qMax(width, height) * pixelStride;
-    QScopedPointer<uint8_t, QScopedPointerArrayDeleter<uint8_t> > buf(new uint8_t[2 * bufferStride]);
+    QScopedPointer<uint8_t, QScopedPointerArrayDeleter<uint8_t>> buf(new uint8_t[2 * bufferStride]);
     uint8_t *buf1 = buf.data();
     uint8_t *buf2 = buf1 + bufferStride;
 
@@ -258,15 +258,15 @@ static void renderShadow(QPainter *painter, const QRect &rect, qreal borderRadiu
 
     const qreal xRadius = 2.0 * borderRadius / boxRect.width();
     const qreal yRadius = 2.0 * borderRadius / boxRect.height();
-    //qDebug() << " radius: " << radius;
+    // qDebug() << " radius: " << radius;
     QPainter shadowPainter;
     shadowPainter.begin(&shadow);
     shadowPainter.setRenderHint(QPainter::Antialiasing);
     shadowPainter.setPen(Qt::NoPen);
     shadowPainter.setBrush(Qt::black);
     // For some reason, if radius is <=3, the shadow edge becomes too sharp, so we work around this. FIXME
-    //shadowPainter.drawRoundedRect(boxRect, xRadius, yRadius);
-    shadowPainter.drawRoundedRect(boxRect, radius > 3 ? xRadius : borderRadius, radius > 3 ? yRadius : borderRadius );
+    // shadowPainter.drawRoundedRect(boxRect, xRadius, yRadius);
+    shadowPainter.drawRoundedRect(boxRect, radius > 3 ? xRadius : borderRadius, radius > 3 ? yRadius : borderRadius);
     shadowPainter.end();
 
     // Because the shadow texture is symmetrical, that's enough to blur
@@ -321,8 +321,7 @@ QImage BoxShadowRenderer::render() const
 
     QSize canvasSize;
     for (const Shadow &shadow : qAsConst(m_shadows)) {
-        canvasSize = canvasSize.expandedTo(
-            calculateMinimumShadowTextureSize(m_boxSize, shadow.radius, shadow.offset));
+        canvasSize = canvasSize.expandedTo(calculateMinimumShadowTextureSize(m_boxSize, shadow.radius, shadow.offset));
     }
 
     QImage canvas(canvasSize * m_dpr, QImage::Format_ARGB32_Premultiplied);

@@ -26,18 +26,18 @@
 namespace Lightly
 {
 
-    //_________________________________________________
-    QStyle* StylePlugin::create( const QString &key )
-    {
-        if( key.toLower() == QStringLiteral( "lightly" ) )
-        {
-            return new Style;
-        }
-        return nullptr;
+//_________________________________________________
+QStyle *StylePlugin::create(const QString &key)
+{
+    if (key.toLower() == QStringLiteral("lightly")) {
+        return new Style;
     }
+    return nullptr;
+}
 
-    //_________________________________________________
-    QStringList StylePlugin::keys() const
-    { return QStringList( QStringLiteral( "Lightly" ) ); }
-
+//_________________________________________________
+QStringList StylePlugin::keys() const
+{
+    return QStringList(QStringLiteral("Lightly"));
+}
 }

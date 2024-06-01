@@ -27,53 +27,50 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include "lightlysettings.h"
 #include "lightly.h"
+#include "lightlysettings.h"
 
 #include <KSharedConfig>
 
 namespace Lightly
 {
 
-    //! lightly exceptions list
-    class ExceptionList
+//! lightly exceptions list
+class ExceptionList
+{
+public:
+    //! constructor from list
+    explicit ExceptionList(const InternalSettingsList &exceptions = InternalSettingsList())
+        : _exceptions(exceptions)
     {
+    }
 
-        public:
+    //! exceptions
+    const InternalSettingsList &get(void) const
+    {
+        return _exceptions;
+    }
 
-        //! constructor from list
-        explicit ExceptionList( const InternalSettingsList& exceptions = InternalSettingsList() ):
-            _exceptions( exceptions )
-        {}
+    //! read from KConfig
+    void readConfig(KSharedConfig::Ptr);
 
-        //! exceptions
-        const InternalSettingsList& get( void ) const
-        { return _exceptions; }
+    //! write to kconfig
+    void writeConfig(KSharedConfig::Ptr);
 
-        //! read from KConfig
-        void readConfig( KSharedConfig::Ptr );
+protected:
+    //! generate exception group name for given exception index
+    static QString exceptionGroupName(int index);
 
-        //! write to kconfig
-        void writeConfig( KSharedConfig::Ptr );
+    //! read configuration
+    static void readConfig(KCoreConfigSkeleton *, KConfig *, const QString &);
 
-        protected:
+    //! write configuration
+    static void writeConfig(KCoreConfigSkeleton *, KConfig *, const QString &);
 
-        //! generate exception group name for given exception index
-        static QString exceptionGroupName( int index );
-
-        //! read configuration
-        static void readConfig( KCoreConfigSkeleton*, KConfig*, const QString& );
-
-        //! write configuration
-        static void writeConfig( KCoreConfigSkeleton*, KConfig*, const QString& );
-
-        private:
-
-        //! exceptions
-        InternalSettingsList _exceptions;
-
-    };
-
+private:
+    //! exceptions
+    InternalSettingsList _exceptions;
+};
 }
 
 #endif

@@ -35,59 +35,58 @@
 #include "lightlyhelper.h"
 
 #include <QHash>
-#include <QSet>
 #include <QObject>
+#include <QSet>
 
 namespace Lightly
 {
-    class BlurHelper: public QObject
+class BlurHelper : public QObject
+{
+    Q_OBJECT
+
+public:
+    //! constructor
+    BlurHelper(QObject *);
+
+    //! register widget
+    void registerWidget(QWidget *, const bool isDolphin);
+
+    //! register widget
+    void unregisterWidget(QWidget *);
+
+    //! event filter
+    bool eventFilter(QObject *, QEvent *) override;
+
+    //! force update
+    void forceUpdate(QWidget *widget)
     {
-        Q_OBJECT
+        if (widget->isWindow())
+            update(widget);
+    }
 
-        public:
+    void setTranslucentTitlebar(bool value)
+    {
+        _translucentTitlebar = value;
+    }
 
-        //! constructor
-        BlurHelper( QObject* );
+protected:
+    //! install event filter to object, in a unique way
+    void addEventFilter(QObject *object)
+    {
+        object->removeEventFilter(this);
+        object->installEventFilter(this);
+    }
 
-        //! register widget
-        void registerWidget( QWidget*, const bool isDolphin );
+    //! handle blur region
+    QRegion blurRegion(QWidget *widget) const;
 
-        //! register widget
-        void unregisterWidget( QWidget* );
+    //! update blur regions for given widget
+    void update(QWidget *) const;
 
-        //! event filter
-        bool eventFilter( QObject*, QEvent* ) override;
-        
-        //! force update
-        void forceUpdate( QWidget* widget )
-        { if( widget->isWindow() ) update( widget ); }
-        
-        void setTranslucentTitlebar( bool value )
-        { _translucentTitlebar = value; }
-
-        protected:
-
-        //! install event filter to object, in a unique way
-        void addEventFilter( QObject* object )
-        {
-            object->removeEventFilter( this );
-            object->installEventFilter( this );
-        }
-        
-        //! handle blur region
-        QRegion blurRegion (QWidget* widget) const;
-
-        //! update blur regions for given widget
-        void update( QWidget* ) const;
-        
-        private:
-        
-        bool _isDolphin = false;
-        bool _translucentTitlebar = false;
-            
-
-    };
-
+private:
+    bool _isDolphin = false;
+    bool _translucentTitlebar = false;
+};
 }
 
 #endif

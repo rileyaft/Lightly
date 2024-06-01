@@ -23,34 +23,35 @@
 namespace Lightly
 {
 
-    //______________________________________________
-    bool WidgetStateData::updateState( bool value, AnimationParameters parameters )
-    {
-        if( !_initialized )
-        {
+//______________________________________________
+bool WidgetStateData::updateState(bool value, AnimationParameters parameters)
+{
+    if (!_initialized) {
+        _state = value;
+        _initialized = true;
+        return false;
 
-            _state = value;
-            _initialized = true;
-            return false;
+    } else if (_state == value) {
+        return false;
 
-        } else if( _state == value ) {
+    } else {
+        _state = value;
+        animation().data()->setDirection((parameters & AnimationForwardOnly) ? Animation::Forward : _state ? Animation::Forward : Animation::Backward);
+        if (parameters & AnimationOutBack)
+            animation().data()->setEasingCurve(_state ? QEasingCurve::OutBack : QEasingCurve::InQuint);
+        else
+            animation().data()->setEasingCurve((parameters & AnimationForwardOnly) ? QEasingCurve::OutQuint
+                                                   : _state                        ? QEasingCurve::OutQuint
+                                                                                   : QEasingCurve::InQuint);
 
-            return false;
+        if ((parameters & AnimationLongDuration))
+            animation().data()->setDuration(StyleConfigData::animationsDuration() * 3); // FIXME find a better way to set the duration
 
-        } else {
-            _state = value;
-            animation().data()->setDirection( ( parameters & AnimationForwardOnly ) ? Animation::Forward : _state ? Animation::Forward : Animation::Backward );
-            if ( parameters & AnimationOutBack) animation().data()->setEasingCurve( _state ? QEasingCurve::OutBack : QEasingCurve::InQuint );
-            else animation().data()->setEasingCurve( ( parameters & AnimationForwardOnly ) ? QEasingCurve::OutQuint : _state ? QEasingCurve::OutQuint : QEasingCurve::InQuint );
-            
-            if( ( parameters & AnimationLongDuration ) ) animation().data()->setDuration( StyleConfigData::animationsDuration()*3 ); //FIXME find a better way to set the duration
-            
-            if( !animation().data()->isRunning() ) animation().data()->start(); 
-            else if( _state && ( parameters & AnimationForwardOnly ) ) animation().data()->restart();
-            return true;
-
-        }
-
+        if (!animation().data()->isRunning())
+            animation().data()->start();
+        else if (_state && (parameters & AnimationForwardOnly))
+            animation().data()->restart();
+        return true;
     }
-
+}
 }

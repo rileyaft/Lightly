@@ -25,69 +25,63 @@
 // IN THE SOFTWARE.
 //////////////////////////////////////////////////////////////////////////////
 
-#include "/config/ui_lightlyconfigurationui.h"
+#include "config/ui_lightlyconfigurationui.h"
+#include "lightly.h"
 #include "lightlyexceptionlistwidget.h"
 #include "lightlysettings.h"
-#include "lightly.h"
 
 #include <KCModule>
 #include <KSharedConfig>
 
-#include <QWidget>
 #include <QSharedPointer>
+#include <QWidget>
 
 namespace Lightly
 {
 
-    //_____________________________________________
-    class ConfigWidget: public KCModule
-    {
+//_____________________________________________
+class ConfigWidget : public KCModule
+{
+    Q_OBJECT
 
-        Q_OBJECT
+public:
+    //* constructor
+    explicit ConfigWidget(QObject *parent, const KPluginMetaData &data, const QVariantList &args);
 
-        public:
+    //* destructor
+    virtual ~ConfigWidget() = default;
 
-        //* constructor
-        explicit ConfigWidget(QObject *parent, const KPluginMetaData &data, const QVariantList &args);
+    //* default
+    void defaults() override;
 
-        //* destructor
-        virtual ~ConfigWidget() = default;
+    //* load configuration
+    void load() override;
 
-        //* default
-        void defaults() override;
+    //* save configuration
+    void save() override;
 
-        //* load configuration
-        void load() override;
+protected Q_SLOTS:
 
-        //* save configuration
-        void save() override;
+    //* update changed state
+    virtual void updateChanged();
 
-        protected Q_SLOTS:
+protected:
+    //* set changed state
+    void setChanged(bool);
 
-        //* update changed state
-        virtual void updateChanged();
+private:
+    //* ui
+    Ui_LightlyConfigurationUI m_ui;
 
-        protected:
+    //* kconfiguration object
+    KSharedConfig::Ptr m_configuration;
 
-        //* set changed state
-        void setChanged( bool );
+    //* internal exception
+    InternalSettingsPtr m_internalSettings;
 
-        private:
-
-        //* ui
-        Ui_LightlyConfigurationUI m_ui;
-
-        //* kconfiguration object
-        KSharedConfig::Ptr m_configuration;
-
-        //* internal exception
-        InternalSettingsPtr m_internalSettings;
-
-        //* changed state
-        bool m_changed;
-
-    };
-
+    //* changed state
+    bool m_changed;
+};
 }
 
 #endif

@@ -25,170 +25,163 @@
 
 #include <KWindowShadow>
 
-#include <QObject>
-#include <QPointer>
 #include <QMap>
 #include <QMargins>
+#include <QObject>
+#include <QPointer>
 #include <QSet>
 
 namespace Lightly
 {
 
-    //* forward declaration
-    class Helper;
+//* forward declaration
+class Helper;
 
-    struct ShadowParams
+struct ShadowParams {
+    ShadowParams() = default;
+
+    ShadowParams(const QPoint &offset, int radius, qreal opacity)
+        : offset(offset)
+        , radius(radius)
+        , opacity(opacity)
     {
-        ShadowParams() = default;
+    }
 
-        ShadowParams(const QPoint &offset, int radius, qreal opacity):
-            offset(offset),
-            radius(radius),
-            opacity(opacity)
-        {}
+    QPoint offset;
+    int radius = 0;
+    qreal opacity = 0;
+};
 
-        QPoint offset;
-        int radius = 0;
-        qreal opacity = 0;
-    };
-    
-    struct CustomShadowParams
+struct CustomShadowParams {
+    CustomShadowParams() = default;
+
+    CustomShadowParams(const QPoint &offset, int radius, QColor color)
+        : offset(offset)
+        , radius(radius)
+        , color(color)
     {
-        CustomShadowParams() = default;
+    }
 
-        CustomShadowParams(const QPoint &offset, int radius, QColor color):
-            offset(offset),
-            radius(radius),
-            color(color)
-        {}
+    QPoint offset;
+    int radius = 0;
+    QColor color;
+};
 
-        QPoint offset;
-        int radius = 0;
-        QColor color;
-    };
+struct CompositeShadowParams {
+    CompositeShadowParams() = default;
 
-    struct CompositeShadowParams
+    CompositeShadowParams(const QPoint &offset, const ShadowParams &shadow1, const ShadowParams &shadow2, const ShadowParams &shadow3)
+        : offset(offset)
+        , shadow1(shadow1)
+        , shadow2(shadow2)
+        , shadow3(shadow3)
     {
-        CompositeShadowParams() = default;
+    }
 
-        CompositeShadowParams(
-                const QPoint &offset,
-                const ShadowParams &shadow1,
-                const ShadowParams &shadow2,
-                const ShadowParams &shadow3)
-            : offset(offset)
-            , shadow1(shadow1)
-            , shadow2(shadow2)
-            , shadow3(shadow3){}
-
-        bool isNone() const
-        { return qMax(shadow1.radius, qMax(shadow2.radius, shadow3.radius)) == 0; }
-
-        QPoint offset;
-        ShadowParams shadow1;
-        ShadowParams shadow2;
-        ShadowParams shadow3;
-    };
-
-    //* handle shadow pixmaps passed to window manager via X property
-    class ShadowHelper: public QObject
+    bool isNone() const
     {
+        return qMax(shadow1.radius, qMax(shadow2.radius, shadow3.radius)) == 0;
+    }
 
-        Q_OBJECT
+    QPoint offset;
+    ShadowParams shadow1;
+    ShadowParams shadow2;
+    ShadowParams shadow3;
+};
 
-        public:
+//* handle shadow pixmaps passed to window manager via X property
+class ShadowHelper : public QObject
+{
+    Q_OBJECT
 
-        //* constructor
-        ShadowHelper( QObject*, Helper& );
+public:
+    //* constructor
+    ShadowHelper(QObject *, Helper &);
 
-        //* destructor
-        ~ShadowHelper() override;
+    //* destructor
+    ~ShadowHelper() override;
 
-        //* shadow params from size enum
-        static CompositeShadowParams lookupShadowParams( int shadowSizeEnum );
+    //* shadow params from size enum
+    static CompositeShadowParams lookupShadowParams(int shadowSizeEnum);
 
-        //* reset
-        void reset();
+    //* reset
+    void reset();
 
-        //* load config
-        void loadConfig();
+    //* load config
+    void loadConfig();
 
-        //* register widget
-        bool registerWidget( QWidget*, bool force = false );
+    //* register widget
+    bool registerWidget(QWidget *, bool force = false);
 
-        //* unregister widget
-        void unregisterWidget( QWidget* );
+    //* unregister widget
+    void unregisterWidget(QWidget *);
 
-        //* event filter
-        bool eventFilter( QObject*, QEvent* ) override;
+    //* event filter
+    bool eventFilter(QObject *, QEvent *) override;
 
-        //* shadow tiles
-        /** is public because it is also needed for mdi windows */
-        TileSet shadowTiles();
-        static TileSet shadowTiles( const int frameRadius, CustomShadowParams shadow1, CustomShadowParams shadow2 = CustomShadowParams() );
+    //* shadow tiles
+    /** is public because it is also needed for mdi windows */
+    TileSet shadowTiles();
+    static TileSet shadowTiles(const int frameRadius, CustomShadowParams shadow1, CustomShadowParams shadow2 = CustomShadowParams());
 
-        protected Q_SLOTS:
+protected Q_SLOTS:
 
-        //* unregister widget
-        void widgetDeleted( QObject* );
+    //* unregister widget
+    void widgetDeleted(QObject *);
 
-        //* unregister window
-        void windowDeleted( QObject* );
+    //* unregister window
+    void windowDeleted(QObject *);
 
-        protected:
+protected:
+    //* true if widget is a menu
+    bool isMenu(QWidget *) const;
 
-        //* true if widget is a menu
-        bool isMenu( QWidget* ) const;
+    //* true if widget is a tooltip
+    bool isToolTip(QWidget *) const;
 
-        //* true if widget is a tooltip
-        bool isToolTip( QWidget* ) const;
+    //* dock widget
+    bool isDockWidget(QWidget *) const;
 
-        //* dock widget
-        bool isDockWidget( QWidget* ) const;
+    //* toolbar
+    bool isToolBar(QWidget *) const;
 
-        //* toolbar
-        bool isToolBar( QWidget* ) const;
+    //* accept widget
+    bool acceptWidget(QWidget *) const;
 
-        //* accept widget
-        bool acceptWidget( QWidget* ) const;
+    // create shared shadow tiles from tileset
+    const QVector<KWindowShadowTile::Ptr> &createShadowTiles();
 
-        // create shared shadow tiles from tileset
-        const QVector<KWindowShadowTile::Ptr>& createShadowTiles();
+    // create shadow tile from pixmap
+    KWindowShadowTile::Ptr createTile(const QPixmap &);
 
-        // create shadow tile from pixmap
-        KWindowShadowTile::Ptr createTile( const QPixmap& );
+    //* installs shadow on given widget in a platform independent way
+    void installShadows(QWidget *);
 
-        //* installs shadow on given widget in a platform independent way
-        void installShadows( QWidget * );
+    //* uninstalls shadow on given widget in a platform independent way
+    void uninstallShadows(QWidget *);
 
-        //* uninstalls shadow on given widget in a platform independent way
-        void uninstallShadows( QWidget * );
+    //* gets the shadow margins for the given widget
+    QMargins shadowMargins(QWidget *) const;
 
-        //* gets the shadow margins for the given widget
-        QMargins shadowMargins( QWidget* ) const;
+private:
+    //* helper
+    Helper &_helper;
 
-        private:
+    //* registered widgets
+    QSet<QWidget *> _widgets;
 
-        //* helper
-        Helper& _helper;
+    //* managed shadows
+    QMap<QWindow *, KWindowShadow *> _shadows;
 
-        //* registered widgets
-        QSet<QWidget*> _widgets;
+    //* tileset
+    TileSet _shadowTiles;
 
-        //* managed shadows
-        QMap<QWindow*, KWindowShadow*> _shadows;
+    //* number of tiles
+    enum { numTiles = 8 };
 
-        //* tileset
-        TileSet _shadowTiles;
-
-        //* number of tiles
-        enum { numTiles = 8 };
-
-        //* shared shadow tiles
-        QVector<KWindowShadowTile::Ptr> _tiles;
-
-    };
-
+    //* shared shadow tiles
+    QVector<KWindowShadowTile::Ptr> _tiles;
+};
 }
 
 #endif

@@ -20,13 +20,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA .        *
  *************************************************************************/
 
-#include "lightlydecoration.h"
 #include "config-lightly.h"
+#include "lightlydecoration.h"
 
 #include <QMouseEvent>
 #include <QPaintEvent>
-#include <QWidget>
 #include <QPointer>
+#include <QWidget>
 
 #if LIGHTLY_HAVE_X11
 #include <xcb/xcb.h>
@@ -35,66 +35,56 @@
 namespace Lightly
 {
 
-    //* implements size grip for all widgets
-    class SizeGrip: public QWidget
-    {
+//* implements size grip for all widgets
+class SizeGrip : public QWidget
+{
+    Q_OBJECT
 
-        Q_OBJECT
+public:
+    //* constructor
+    explicit SizeGrip(Decoration *);
 
-        public:
+    //* constructor
+    virtual ~SizeGrip();
 
-        //* constructor
-        explicit SizeGrip( Decoration* );
+protected Q_SLOTS:
 
-        //* constructor
-        virtual ~SizeGrip();
+    //* update background color
+    void updateActiveState();
 
-        protected Q_SLOTS:
+    //* update position
+    void updatePosition();
 
-        //* update background color
-        void updateActiveState();
+    //* embed into parent widget
+    void embed();
 
-        //* update position
-        void updatePosition();
+protected:
+    //*@name event handlers
+    //@{
 
-        //* embed into parent widget
-        void embed();
+    //* paint
+    virtual void paintEvent(QPaintEvent *) override;
 
-        protected:
+    //* mouse press
+    virtual void mousePressEvent(QMouseEvent *) override;
 
-        //*@name event handlers
-        //@{
+    //@}
 
-        //* paint
-        virtual void paintEvent( QPaintEvent* ) override;
+private:
+    //* send resize event
+    void sendMoveResizeEvent(QPoint);
 
-        //* mouse press
-        virtual void mousePressEvent( QMouseEvent* ) override;
+    //* grip size
+    enum { Offset = 0, GripSize = 14 };
 
-        //@}
+    //* decoration
+    QPointer<Decoration> m_decoration;
 
-        private:
-
-        //* send resize event
-        void sendMoveResizeEvent( QPoint );
-
-        //* grip size
-        enum {
-            Offset = 0,
-            GripSize = 14
-        };
-
-        //* decoration
-        QPointer<Decoration> m_decoration;
-
-        //* move/resize atom
-        #if LIGHTLY_HAVE_X11
-        xcb_atom_t m_moveResizeAtom = 0;
-        #endif
-
-    };
-
-
+//* move/resize atom
+#if LIGHTLY_HAVE_X11
+    xcb_atom_t m_moveResizeAtom = 0;
+#endif
+};
 }
 
 #endif
