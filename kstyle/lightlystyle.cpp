@@ -239,11 +239,6 @@ void Style::polish(QApplication *app)
 
     if (StyleConfigData::opaqueApps().contains(appName, Qt::CaseInsensitive) || StyleConfigData::forceOpaque().contains(appName, Qt::CaseInsensitive))
         _isOpaque = true;
-
-    const qreal dpr = qApp->devicePixelRatio();
-    bool nonIntegerScale = (dpr > static_cast<qreal>(1) && static_cast<qreal>(qRound(dpr)) != dpr);
-    if (nonIntegerScale)
-        _isOpaque = true;
     if (_translucentWidgets.size() > 0)
         _translucentWidgets.clear();
 
