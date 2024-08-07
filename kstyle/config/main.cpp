@@ -37,18 +37,17 @@ int main(int argc, char *argv[])
 {
     KLocalizedString::setApplicationDomain("lightly_style_config");
 
-    QApplication app( argc, argv );
-    app.setApplicationName( i18n( "Lightly Settings" ) );
-    app.setWindowIcon( QIcon::fromTheme( QStringLiteral( "lightly-settings" ) ) );
+    QApplication app(argc, argv);
+    app.setApplicationName(i18n("Lightly Settings"));
+    app.setWindowIcon(QIcon::fromTheme(QStringLiteral("lightly-settings")));
 
     KCMultiDialog dialog;
-    dialog.setWindowTitle( i18n( "Lightly Settings" ) );
+    dialog.setWindowTitle(i18n("Lightly Settings"));
     dialog.addModule(KPluginMetaData(QStringLiteral("kstyle_config/lightlystyleconfig")));
     dialog.addModule(KPluginMetaData(QStringLiteral("org.kde.kdecoration2.kcm/kcm_lightlydecoration.so")));
     dialog.show();
 
-    foreach( auto child, dialog.findChildren<QAbstractScrollArea*>() )
-    {
+    foreach (auto child, dialog.findChildren<QAbstractScrollArea *>()) {
         child->adjustSize();
         child->viewport()->adjustSize();
     }

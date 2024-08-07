@@ -29,34 +29,33 @@ K_PLUGIN_CLASS_WITH_JSON(Lightly::ConfigurationModule, "lightlystyleconfig.json"
 namespace Lightly
 {
 
-    //_______________________________________________________________________
-    ConfigurationModule::ConfigurationModule(QObject *parent, const KPluginMetaData &data)
+//_______________________________________________________________________
+ConfigurationModule::ConfigurationModule(QObject *parent, const KPluginMetaData &data)
     : KCModule(parent, data)
-    {
-       widget()->setLayout(new QVBoxLayout);
-       widget()->layout()->addWidget( m_config = new StyleConfig(widget()));
-       connect(m_config, &StyleConfig::changed, this, &KCModule::setNeedsSave);
-    }
+{
+    widget()->setLayout(new QVBoxLayout);
+    widget()->layout()->addWidget(m_config = new StyleConfig(widget()));
+    connect(m_config, &StyleConfig::changed, this, &KCModule::setNeedsSave);
+}
 
-    //_______________________________________________________________________
-    void ConfigurationModule::defaults()
-    {
-        m_config->defaults();
-        KCModule::defaults();
-    }
+//_______________________________________________________________________
+void ConfigurationModule::defaults()
+{
+    m_config->defaults();
+    KCModule::defaults();
+}
 
-    //_______________________________________________________________________
-    void ConfigurationModule::load()
-    {
-        m_config->load();
-        KCModule::load();
-    }
+//_______________________________________________________________________
+void ConfigurationModule::load()
+{
+    m_config->load();
+    KCModule::load();
+}
 
-    //_______________________________________________________________________
-    void ConfigurationModule::save()
-    {
-        m_config->save();
-        KCModule::save();
-    }
-
+//_______________________________________________________________________
+void ConfigurationModule::save()
+{
+    m_config->save();
+    KCModule::save();
+}
 }

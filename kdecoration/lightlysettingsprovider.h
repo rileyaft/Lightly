@@ -20,9 +20,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "lightly.h"
 #include "lightlydecoration.h"
 #include "lightlysettings.h"
-#include "lightly.h"
 
 #include <KSharedConfig>
 
@@ -31,46 +31,41 @@
 namespace Lightly
 {
 
-    class SettingsProvider: public QObject
-    {
+class SettingsProvider : public QObject
+{
+    Q_OBJECT
 
-        Q_OBJECT
+public:
+    //* destructor
+    ~SettingsProvider();
 
-        public:
+    //* singleton
+    static SettingsProvider *self();
 
-        //* destructor
-        ~SettingsProvider();
+    //* internal settings for given decoration
+    InternalSettingsPtr internalSettings(Decoration *) const;
 
-        //* singleton
-        static SettingsProvider *self();
+public Q_SLOTS:
 
-        //* internal settings for given decoration
-        InternalSettingsPtr internalSettings(Decoration *) const;
+    //* reconfigure
+    void reconfigure();
 
-        public Q_SLOTS:
+private:
+    //* constructor
+    SettingsProvider();
 
-        //* reconfigure
-        void reconfigure();
+    //* default configuration
+    InternalSettingsPtr m_defaultSettings;
 
-        private:
+    //* exceptions
+    InternalSettingsList m_exceptions;
 
-        //* constructor
-        SettingsProvider();
+    //* config object
+    KSharedConfigPtr m_config;
 
-        //* default configuration
-        InternalSettingsPtr m_defaultSettings;
-
-        //* exceptions
-        InternalSettingsList m_exceptions;
-
-        //* config object
-        KSharedConfigPtr m_config;
-
-        //* singleton
-        static SettingsProvider *s_self;
-
-    };
-
+    //* singleton
+    static SettingsProvider *s_self;
+};
 }
 
 #endif

@@ -27,28 +27,24 @@
 namespace Lightly
 {
 
-    //* configuration module
-    class ConfigurationModule: public KCModule
-    {
+//* configuration module
+class ConfigurationModule : public KCModule
+{
+    Q_OBJECT
 
-        Q_OBJECT
+public:
+    ConfigurationModule(QObject *parent, const KPluginMetaData &data);
 
-        public:
-           ConfigurationModule(QObject *parent, const KPluginMetaData &data);
+public Q_SLOTS:
 
-        public Q_SLOTS:
+    void defaults() override;
+    void load() override;
+    void save() override;
 
-        void defaults() override;
-        void load() override;
-        void save() override;
-
-        private:
-
-        //* configuration
-        StyleConfig* m_config;
-
-    };
-
+private:
+    //* configuration
+    StyleConfig *m_config;
+};
 }
 
 #endif

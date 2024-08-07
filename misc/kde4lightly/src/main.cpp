@@ -18,15 +18,15 @@
  ***************************************************************************/
 
 #include <QCoreApplication>
-#include <QStandardPaths>
 #include <QDebug>
-#include <QFile>
 #include <QDir>
+#include <QFile>
+#include <QStandardPaths>
 #include <QStyleFactory>
 #include <kdelibs4migration.h>
 
-#include <KSharedConfig>
 #include <KConfigGroup>
+#include <KSharedConfig>
 #include <kconfig.h>
 
 static const QString defaultLookAndFeelPackage = "org.kde.lightly.desktop";
@@ -56,8 +56,7 @@ void cloneColorScheme(const QString &colorScheme)
     QFile::copy(src, dest);
 }
 
-QVariant readConfigValue(KSharedConfigPtr lnfConfig, KSharedConfigPtr defaultLnfConfig,
-                         const QString &group, const QString &key, const QVariant &defaultValue)
+QVariant readConfigValue(KSharedConfigPtr lnfConfig, KSharedConfigPtr defaultLnfConfig, const QString &group, const QString &key, const QVariant &defaultValue)
 {
     QVariant value;
 
@@ -85,7 +84,7 @@ QVariant readConfigValue(KSharedConfigPtr lnfConfig, KSharedConfigPtr defaultLnf
 void updateKdeGlobals()
 {
     Kdelibs4Migration migration;
-    //Apply the color scheme
+    // Apply the color scheme
     KConfig config(migration.saveLocation("config") + "kdeglobals", KConfig::SimpleConfig);
 
     KSharedConfig::Ptr kf5Config = KSharedConfig::openConfig("kdeglobals");
@@ -95,9 +94,11 @@ void updateKdeGlobals()
     const QString looknfeel = kf52Group.readEntry("LookAndFeelPackage", defaultLookAndFeelPackage);
 
     KSharedConfigPtr lnfConfig;
-    KSharedConfigPtr defaultLnfConfig = KSharedConfig::openConfig(QStandardPaths::locate(QStandardPaths::GenericDataLocation, "plasma/look-and-feel/" + defaultLookAndFeelPackage + "/contents/defaults"));
+    KSharedConfigPtr defaultLnfConfig = KSharedConfig::openConfig(
+        QStandardPaths::locate(QStandardPaths::GenericDataLocation, "plasma/look-and-feel/" + defaultLookAndFeelPackage + "/contents/defaults"));
     if (looknfeel != defaultLookAndFeelPackage) {
-        lnfConfig = KSharedConfig::openConfig(QStandardPaths::locate(QStandardPaths::GenericDataLocation, "plasma/look-and-feel/" + looknfeel + "/contents/defaults"));
+        lnfConfig =
+            KSharedConfig::openConfig(QStandardPaths::locate(QStandardPaths::GenericDataLocation, "plasma/look-and-feel/" + looknfeel + "/contents/defaults"));
     }
 
     const QString widgetStyle = readConfigValue(lnfConfig, defaultLnfConfig, "KDE", "widgetStyle", "Lightly").toString();
@@ -106,7 +107,7 @@ void updateKdeGlobals()
 
     cloneColorScheme(colorScheme);
 
-    //use only if the style from the look and feel package is installed
+    // use only if the style from the look and feel package is installed
     const bool hasWidgetStyle = QStyleFactory::keys().contains(widgetStyle);
     KConfigGroup group(&config, "General");
     group.writeEntry("ColorScheme", colorScheme);
@@ -114,7 +115,7 @@ void updateKdeGlobals()
     qDebug() << "setting widget style:" << widgetStyle << hasWidgetStyle;
     if (hasWidgetStyle) {
         group.writeEntry("widgetStyle", widgetStyle);
-        //for some reason this seems necessary
+        // for some reason this seems necessary
         group.sync();
     }
     applyColorScheme(colorScheme, &config);
@@ -124,7 +125,6 @@ void updateKdeGlobals()
     iconGroup.writeEntry("Theme", icons);
     iconGroup.sync();
 
-
     kf5Group.writeEntry("ColorScheme", colorScheme);
     kf5Group.sync();
     if (hasWidgetStyle) {
@@ -132,7 +132,6 @@ void updateKdeGlobals()
     }
     applyColorScheme(colorScheme, kf5Group.config());
     kf5Group.sync();
-
 
     kf52Group.writeEntry("ColorScheme", colorScheme);
     if (hasWidgetStyle) {
@@ -148,7 +147,6 @@ void updateKdeGlobals()
 
 int main(int argc, char **argv)
 {
-
     QCoreApplication app(argc, argv);
 
     updateKdeGlobals();
